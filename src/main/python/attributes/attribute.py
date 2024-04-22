@@ -1,4 +1,4 @@
-from uc3m_travel import HotelManagementException
+from python.uc3m_travel.hotel_management_exception import HotelManagementException
 import re
 
 class Attribute():

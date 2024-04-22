@@ -2,12 +2,14 @@ from uc3m_travel import HotelManagementException
 from .attribute import Attribute
 
 class NumDays(Attribute):
+    """Check NumDays"""
     def __init__(self, num_days):
         self._error_message = "Invalid number of days"
         self._attribute_value = self.validate(num_days)
 
     def validate(self,num_days):
         """validates the number of days"""
+        super().validate((num_days))
         try:
             days = int(num_days)
         except ValueError as ex:

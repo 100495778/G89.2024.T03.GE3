@@ -1,26 +1,26 @@
 """Module for the hotel manager"""
-import re
+#import re
 import json
 from datetime import datetime
-
-from attributes import ArrivalDate
-from attributes import CreditCard
-from attributes import Dni
-from attributes import Localizer
-from attributes import NameSurname
-from attributes import NumDays
-from attributes import PhoneNumber
-from attributes import RoomKey
-from attributes import RoomType
-from uc3m_travel.hotel_management_exception import HotelManagementException
-from uc3m_travel.hotel_reservation import HotelReservation
-from uc3m_travel.hotel_stay import HotelStay
-from uc3m_travel.hotel_management_config import JSON_FILES_PATH
+from python.attributes.att_arrival import ArrivalDate
+from python.attributes.att_creditcard import CreditCard
+from python.attributes.att_dni import Dni
+from python.attributes.att_localizer import Localizer
+from python.attributes.att_namesurname import NameSurname
+from python.attributes.att_numdays import NumDays
+from python.attributes.att_phonenumber import PhoneNumber
+from python.attributes.att_roomkey import RoomKey
+from python.attributes.att_roomtype import RoomType
+from python.uc3m_travel.hotel_management_exception import HotelManagementException
+from python.uc3m_travel.hotel_reservation import HotelReservation
+from python.uc3m_travel.hotel_stay import HotelStay
+from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from freezegun import freeze_time
 
 
+
 class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localizer, NumDays, RoomKey):
-    """Class with all the methods for managing reservations and stays"""
+    """Class with all the methods for managing reservations and stay"""
     def __init__(self):
         pass
 

@@ -24,31 +24,31 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
     def __init__(self):
         pass
 
-    def read_data_from_json(self, fi):
+    def read_data_from_json(self, file):
         """reads the content of a json file with two fields: CreditCard and phoneNumber"""
         try:
-            with open(fi, encoding='utf-8') as f:
-                json_data = json.load(f)
-        except FileNotFoundError as e:
-            raise HotelManagementException("Wrong file or file path") from e
-        except json.JSONDecodeError as e:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from e
+            with open(file, encoding='utf-8') as file:
+                json_data = json.load(file)
+        except FileNotFoundError as exception:
+            raise HotelManagementException("Wrong file or file path") from exception
+        except json.JSONDecodeError as exception:
+            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from exception
         try:
-            c = json_data["CreditCard"]
-            p = json_data["phoneNumber"]
-            req = HotelReservation(id_card="12345678Z",
-                                   credit_card_number=c,
+            credit_card = json_data["CreditCard"]
+            phone_num = json_data["phoneNumber"]
+            reservation = HotelReservation(id_card="12345678Z",
+                                   credit_card_number=credit_card,
                                    name_surname="John Doe",
-                                   phone_number=p,
+                                   phone_number=phone_num,
                                    room_type="single",
                                    num_days=3,
                                    arrival="20/01/2024")
-        except KeyError as e:
-            raise HotelManagementException("JSON Decode Error - Invalid JSON Key") from e
-        if not self.validatecreditcard(c):
+        except KeyError as error:
+            raise HotelManagementException("JSON Decode Error - Invalid JSON Key") from error
+        if not credit_card.validatecreditcard(credit_card):
             raise HotelManagementException("Invalid credit card number")
         # Close the file
-        return req
+        return reservation
 
     # pylint: disable=too-many-arguments
     def room_reservation(self,

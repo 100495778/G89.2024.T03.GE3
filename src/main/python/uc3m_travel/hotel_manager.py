@@ -2,15 +2,15 @@
 #import re
 import json
 from datetime import datetime
-from python.attributes.att_arrival import ArrivalDate
-from python.attributes.att_creditcard import CreditCard
-from python.attributes.att_dni import Dni
-from python.attributes.att_localizer import Localizer
-from python.attributes.att_namesurname import NameSurname
-from python.attributes.att_numdays import NumDays
-from python.attributes.att_phonenumber import PhoneNumber
-from python.attributes.att_roomkey import RoomKey
-from python.attributes.att_roomtype import RoomType
+from python.attributes2.att_arrival import ArrivalDate
+from python.attributes2.att_creditcard import CreditCard
+from python.attributes2.att_dni import Dni
+from python.attributes2.att_localizer import Localizer
+from python.attributes2.att_namesurname import NameSurname
+from python.attributes2.att_numdays import NumDays
+from python.attributes2.att_phonenumber import PhoneNumber
+from python.attributes2.att_roomkey import RoomKey
+from python.attributes2.att_roomtype import RoomType
 from python.uc3m_travel.hotel_management_exception import HotelManagementException
 from python.uc3m_travel.hotel_reservation import HotelReservation
 from python.uc3m_travel.hotel_stay import HotelStay

@@ -1,9 +1,9 @@
 import re
-import hotel_management_exception
-from .attribute import Attribute
+import python.uc3m_travel.hotel_management_exception
+import attribute
 
 
-class CreditCard(Attribute):
+class CreditCard(attribute.Attribute):
     """CredictCard Check"""
     def __init__(self, attribute_value):
         self._validation_pattern = r"^[0-9]{16}"
@@ -21,7 +21,7 @@ class CreditCard(Attribute):
         myregex = re.compile(self._validation_pattern)
         regex_check = myregex.fullmatch(cardnumber)
         if not regex_check:
-            raise hotel_management_exception.HotelManagementException(self._error_message)
+            raise python.uc3m_travel.hotel_management_exception.HotelManagementException(self._error_message)
         def digits_of(n):
             return [int(d) for d in str(n)]
 
@@ -34,5 +34,5 @@ class CreditCard(Attribute):
         for d in even_digits:
             checksum += sum(digits_of(d * 2))
         if not checksum % 10 == 0:
-            raise hotel_management_exception.HotelManagementException("Invalid credit card number (not luhn)")
+            raise python.uc3m_travel.hotel_management_exception.HotelManagementException("Invalid credit card number (not luhn)")
         return cardnumber

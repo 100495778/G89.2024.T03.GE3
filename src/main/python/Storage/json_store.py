@@ -1,15 +1,16 @@
 import json
 import hotel_management_exception
 import hotel_management_config
+import python.uc3m_travel.hotel_management_exception
 
 
 class JsonStore ():
     """This class takes the file and the  information we want to store"""
     def __init__(self):
-
+        self._path = hotel_management_config.JSON_FILES_PATH
     def checkout_json(self, room_info):
 
-        file_store = hotel_management_config.JSON_FILES_PATH + "store_reservation.json"
+        file_store = self._path + "store_reservation.json"
 
         # leo los datos del fichero si existe , y si no existe creo una lista vacia
         try:

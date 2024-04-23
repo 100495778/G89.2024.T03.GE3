@@ -1,4 +1,4 @@
-import re
+
 from .attribute import Attribute
 
 

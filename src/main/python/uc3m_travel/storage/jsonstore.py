@@ -13,6 +13,7 @@ class JSonStore():
 
     def save_list_to_file(self):
         # escribo la lista en el fichero
+        print(self.__data_list)
         try:
             with open(self.__file_name, "w", encoding="utf-8", newline="") as file:
                 json.dump(self.__data_list, file, indent=2)

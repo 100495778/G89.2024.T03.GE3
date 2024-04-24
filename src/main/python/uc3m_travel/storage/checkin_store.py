@@ -5,7 +5,7 @@ class CheckInStore(JSonStore):
 
     def __init__(self):
 
-        file_store = file_store = JSON_FILES_PATH + "store_check_in.json"
+        file_store = JSON_FILES_PATH + "store_check_in.json"
         super().__init__(file_store)
 
 

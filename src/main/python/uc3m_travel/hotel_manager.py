@@ -16,6 +16,7 @@ from python.uc3m_travel.hotel_reservation import HotelReservation
 from python.uc3m_travel.hotel_stay import HotelStay
 from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from python.uc3m_travel.hotel_exit import Hotel_exit
+from Storage import json_store
 from freezegun import freeze_time
 
 
@@ -74,8 +75,10 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
         # escribo el fichero Json con todos los datos
         file_store = JSON_FILES_PATH + "store_reservation.json"
+        #llamo a JsonStore para guardar la reserva
+        json_store.JsonStore().save_reservation(my_reservation)
 
-        #leo los datos del fichero si existe , y si no existe creo una lista vacia
+        """"#leo los datos del fichero si existe , y si no existe creo una lista vacia
         try:
             with open(file_store, "r", encoding="utf-8", newline="") as file:
                 data_list = json.load(file)
@@ -98,7 +101,7 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
             with open(file_store, "w", encoding="utf-8", newline="") as file:
                 json.dump(data_list, file, indent=2)
         except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
+            raise HotelManagementException("Wrong file  or file path") from ex"""
 
         return my_reservation.localizer
 
@@ -172,7 +175,8 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
         file_store = JSON_FILES_PATH + "store_check_in.json"
 
         # leo los datos del fichero si existe , y si no existe creo una lista vacia
-        try:
+        json_store.JsonStore().save_checkin(my_checkin)
+        """try:
             with open(file_store, "r", encoding="utf-8", newline="") as file:
                 room_key_list = json.load(file)
         except FileNotFoundError as ex:
@@ -192,7 +196,7 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
             with open(file_store, "w", encoding="utf-8", newline="") as file:
                 json.dump(room_key_list, file, indent=2)
         except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
+            raise HotelManagementException("Wrong file  or file path") from ex"""
 
         return my_checkin.room_key
 

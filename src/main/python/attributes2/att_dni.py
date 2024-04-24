@@ -4,7 +4,7 @@ from uc3m_travel import hotel_management_exception
 class Dni(Attribute):
     def __init__(self, dni):
         self._validation_pattern = r'^[0-9]{8}[A-Z]{1}$'
-        self._error_message = "Invalid DNI"
+        self._error_message = "Invalid IdCard format"
         self._attribute_value = dni
 
     """@staticmethod"""

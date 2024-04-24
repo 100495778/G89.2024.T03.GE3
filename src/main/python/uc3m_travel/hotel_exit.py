@@ -2,12 +2,13 @@ import json
 from attributes2.att_roomkey import RoomKey
 from .hotel_management_exception import HotelManagementException
 from uc3m_travel.hotel_management_config import JSON_FILES_PATH
+from Storage import json_store
 from datetime import datetime
 
 class Hotel_exit():
 
         def __init__(self,roomkey):
-            self._room_key = roomkey
+            self.__room_key = roomkey
 
         @property
         def room_key(self):
@@ -21,7 +22,7 @@ class Hotel_exit():
 
 
         def guest_checkout(self):
-                RoomKey(self._room_key).validate(self._room_key)
+                RoomKey(self.__room_key).validate(self.__room_key)
                 # check thawt the roomkey is stored in the checkins file
                 file_store = JSON_FILES_PATH + "store_check_in.json"
                 try:
@@ -35,7 +36,7 @@ class Hotel_exit():
                 # comprobar que esa room_key es la que me han dado
                 found = False
                 for item in room_key_list:
-                        if self._room_key == item["_HotelStay__room_key"]:
+                        if self.__room_key == item["_HotelStay__room_key"]:
                                 departure_date_timestamp = item["_HotelStay__departure"]
                                 found = True
                 if not found:
@@ -46,7 +47,11 @@ class Hotel_exit():
                         raise HotelManagementException("Error: today is not the departure day")
 
                 file_store_checkout = JSON_FILES_PATH + "store_check_out.json"
-                try:
+
+                json_store.JsonStore().save_checkout(self.__room_key)
+                return True
+
+                """try:
                         with open(file_store_checkout, "r", encoding="utf-8", newline="") as file:
                                 room_key_list = json.load(file)
                 except FileNotFoundError as ex:
@@ -68,4 +73,4 @@ class Hotel_exit():
                 except FileNotFoundError as ex:
                         raise HotelManagementException("Wrong file  or file path") from ex
 
-                return True
+                return True"""

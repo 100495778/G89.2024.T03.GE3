@@ -1,5 +1,5 @@
 import json
-import datetime
+from datetime import datetime
 from uc3m_travel import hotel_management_exception
 from uc3m_travel import hotel_management_config
 

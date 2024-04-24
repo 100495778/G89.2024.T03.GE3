@@ -15,11 +15,12 @@ from python.uc3m_travel.hotel_management_exception import HotelManagementExcepti
 from python.uc3m_travel.hotel_reservation import HotelReservation
 from python.uc3m_travel.hotel_stay import HotelStay
 from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
-from python.uc3m_travel.hotel_exit import Hotel_exit
-from Storage import json_store
+from python.uc3m_travel.hotel_exit import HotelExit
 from freezegun import freeze_time
 from uc3m_travel.storage.jsonstore import JSonStore
 from uc3m_travel.storage.reservation_store import RerservationStore
+from uc3m_travel.storage.checkin_store import CheckInStore
+from uc3m_travel.storage.checkout_store import CheckOutStore
 
 
 
@@ -28,32 +29,6 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
     """Class with all the methods for managing reservations and stay"""
     def __init__(self):
         pass
-
-    def read_data_from_json(self, file):
-        """reads the content of a json file with two fields: CreditCard and phoneNumber"""
-        try:
-            with open(file, encoding='utf-8') as file:
-                json_data = json.load(file)
-        except FileNotFoundError as exception:
-            raise HotelManagementException("Wrong file or file path") from exception
-        except json.JSONDecodeError as exception:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from exception
-        try:
-            credit_card = json_data["CreditCard"]
-            phone_num = json_data["phoneNumber"]
-            reservation = HotelReservation(id_card="12345678Z",
-                                   credit_card_number=credit_card,
-                                   name_surname="John Doe",
-                                   phone_number=phone_num,
-                                   room_type="single",
-                                   num_days=3,
-                                   arrival="20/01/2024")
-        except KeyError as error:
-            raise HotelManagementException("JSON Decode Error - Invalid JSON Key") from error
-        if not credit_card.validatecreditcard(credit_card):
-            raise HotelManagementException("Invalid credit card number")
-        # Close the file
-        return reservation
 
     # pylint: disable=too-many-arguments
     def room_reservation(self,
@@ -65,7 +40,6 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
                          arrival_date: str,
                          num_days:int)->str:
         """manges the hotel reservation: creates a reservation and saves it into a json file"""
-
 
         my_reservation = HotelReservation(id_card=id_card,
                                           credit_card_number=credit_card,
@@ -81,134 +55,19 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
         return my_reservation.localizer
 
-    def save_list_to_file(self, data_list, file_store):
-        # escribo la lista en el fichero
-        try:
-            with open(file_store, "w", encoding="utf-8", newline="") as file:
-                json.dump(data_list, file, indent=2)
-        except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
-
-    def add_item(self, data_list, my_reservation):
-        # añado los datos de mi reserva a la lista , a lo que hubiera
-        data_list.append(my_reservation.__dict__)
-
-    def find_item(self, data_list, my_reservation):
-        # compruebo que esta reserva no esta en la lista
-        for item in data_list:
-            if my_reservation.localizer == item["_HotelReservation__localizer"]:
-                raise HotelManagementException("Reservation already exists")
-            if my_reservation.id_card == item["_HotelReservation__id_card"]:
-                raise HotelManagementException("This ID card has another reservation")
-
-    def load_list_from_file(self):
-        # escribo el fichero Json con todos los datos
-        file_store = JSON_FILES_PATH + "store_reservation.json"
-        # llamo a JsonStore para guardar la reserva
-        # json_store.JsonStore().save_reservation(my_reservation)
-        # leo los datos del fichero si existe , y si no existe creo una lista vacia
-        try:
-            with open(file_store, "r", encoding="utf-8", newline="") as file:
-                data_list = json.load(file)
-        except FileNotFoundError:
-            data_list = []
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
-        return data_list, file_store
 
     def guest_arrival(self, file_input:str)->str:
         """manages the arrival of a guest with a reservation"""
+        #we get information
         my_id_card, my_localizer = self.read_from_input_file(file_input)
 
-
-        my_id_card = Dni(my_id_card).validate(my_id_card)
-        print(my_id_card)
-        my_localizer = Localizer(my_localizer).validate(my_localizer)
-        print(my_localizer)
-        # self.validate_localizer() hay que validar
-
-        #buscar en almacen
-        file_store = JSON_FILES_PATH + "store_reservation.json"
-
-        #leo los datos del fichero , si no existe deber dar error porque el almacen de reservaa
-        # debe existir para hacer el checkin
-        try:
-            with open(file_store, "r", encoding="utf-8", newline="") as file:
-                store_list = json.load(file)
-        except FileNotFoundError as ex:
-            raise HotelManagementException("Error: store reservation not found") from ex
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
-        # compruebo si esa reserva esta en el almacen
-        found = False
-        for item in store_list:
-            if my_localizer == item["_HotelReservation__localizer"]:
-                reservation_days = item["_HotelReservation__num_days"]
-                reservation_room_type = item["_HotelReservation__room_type"]
-                reservation_date_timestamp = item["_HotelReservation__reservation_date"]
-                reservation_credit_card = item["_HotelReservation__credit_card_number"]
-                reservation_date_arrival = item["_HotelReservation__arrival"]
-                reservation_name = item["_HotelReservation__name_surname"]
-                reservation_phone = item["_HotelReservation__phone_number"]
-                reservation_id_card = item["_HotelReservation__id_card"]
-                found = True
-
-        if not found:
-            raise HotelManagementException("Error: localizer not found")
-        if my_id_card != reservation_id_card:
-            raise HotelManagementException("Error: Localizer is not correct for this IdCard")
-        # regenrar clave y ver si coincide
-        reservation_date = datetime.fromtimestamp(reservation_date_timestamp)
-
-        with freeze_time(reservation_date):
-            new_reservation =  HotelReservation(credit_card_number=reservation_credit_card,
-                                                id_card=reservation_id_card,
-                                                num_days=reservation_days,
-                                                room_type=reservation_room_type,
-                                                arrival=reservation_date_arrival,
-                                                name_surname=reservation_name,
-                                                phone_number=reservation_phone)
-        if new_reservation.localizer != my_localizer:
-            raise HotelManagementException("Error: reservation has been manipulated")
-
-        # compruebo si hoy es la fecha de checkin
-        reservation_format = "%d/%m/%Y"
-        date_obj = datetime.strptime(reservation_date_arrival, reservation_format)
-        if date_obj.date() != datetime.date(datetime.utcnow()):
-            raise HotelManagementException("Error: today is not reservation date")
-
         # genero la room key para ello llamo a Hotel Stay
-        my_checkin = HotelStay(idcard=my_id_card, numdays=int(reservation_days),
-                               localizer=my_localizer, roomtype=reservation_room_type)
+        my_checkin = HotelStay(idcard=my_id_card,localizer=my_localizer)
 
-        #Ahora lo guardo en el almacen nuevo de checkin
-        # escribo el fichero Json con todos los datos
-        file_store = JSON_FILES_PATH + "store_check_in.json"
-
-        # leo los datos del fichero si existe , y si no existe creo una lista vacia
-        json_store.JsonStore().save_checkin(my_checkin)
-        try:
-            with open(file_store, "r", encoding="utf-8", newline="") as file:
-                room_key_list = json.load(file)
-        except FileNotFoundError as ex:
-            room_key_list = []
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        # comprobar que no he hecho otro ckeckin antes
-        for item in room_key_list:
-            if my_checkin.room_key == item["_HotelStay__room_key"]:
-                raise HotelManagementException ("ckeckin  ya realizado")
-
-        #añado los datos de mi reserva a la lista , a lo que hubiera
-        room_key_list.append(my_checkin.__dict__)
-
-        try:
-            with open(file_store, "w", encoding="utf-8", newline="") as file:
-                json.dump(room_key_list, file, indent=2)
-        except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
-
+        #I store the information in the Json
+        json_store = CheckInStore()
+        json_store.add_item(my_checkin)
+        json_store.save_list_to_file()
         return my_checkin.room_key
 
     def read_from_input_file(self, file_input):
@@ -229,5 +88,8 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
     def guest_checkout(self, room_key):
         """Register the checkout of the guest"""
-        self.get_stay_from_roomkey(room_key)
-        return Hotel_exit(room_key).guest_checkout()
+        check_out = HotelExit(room_key)
+        return check_out.guest_checkout()
+
+
+

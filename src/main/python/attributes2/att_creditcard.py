@@ -7,7 +7,7 @@ class CreditCard(Attribute):
     """CredictCard Check"""
     def __init__(self, attribute_value):
         self._validation_pattern = r"^[0-9]{16}"
-        self._error_message = "Invalid credit card"
+        self._error_message = "Invalid credit card format"
         self._attribute_value = self.validate(attribute_value)
 
     def validate(self, cardnumber):

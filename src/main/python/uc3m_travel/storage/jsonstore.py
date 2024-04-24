@@ -11,7 +11,7 @@ class JSonStore():
         self.__data_list = []
         self.load_list_from_file()
 
-    def save_list_to_file(self, ):
+    def save_list_to_file(self):
         # escribo la lista en el fichero
         try:
             with open(self.__file_name, "w", encoding="utf-8", newline="") as file:

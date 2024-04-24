@@ -5,24 +5,25 @@ import json
 from uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from uc3m_travel.hotel_management_exception import HotelManagementException
 from attributes2 import att_roomkey
-
+from attributes2.att_dni import Dni
+from attributes2.att_localizer import Localizer
+from .hotel_reservation import HotelReservation
 class HotelStay():
     """Class for representing hotel stays"""
     def __init__(self,
                  idcard:str,
-                 localizer:str,
-                 numdays:int,
-                 roomtype:str):
+                 localizer:str):
         """constructor for HotelStay objects"""
         self.__alg = "SHA-256"
-        self.__type = roomtype
-        self.__idcard = idcard
-        self.__localizer = localizer
+        self.__idcard = Dni(idcard).validate(idcard)
+        self.__localizer = Localizer(localizer).validate(localizer)
+        reservation = HotelReservation.load_reservation_from_localicer(self.__idcard, self.__localizer)
+        self.__type = reservation[1]
         justnow = datetime.utcnow()
         self.__arrival = datetime.timestamp(justnow)
         #timestamp is represented in seconds.miliseconds
         #to add the number of days we must express num_days in seconds
-        self.__departure = self.__arrival + (numdays * 24 * 60 * 60)
+        self.__departure = self.__arrival + (reservation[0] * 24 * 60 * 60)
         self.__room_key = hashlib.sha256(self.__signature_string().encode()).hexdigest()
 
         self.departure_date_timestamp = self.__departure
@@ -76,6 +77,7 @@ class HotelStay():
         att_roomkey.RoomKey(room_key).validate(room_key)
         #check thawt the roomkey is stored in the checkins file
         file_store = JSON_FILES_PATH + "store_check_in.json"
+
         try:
             with open(file_store, "r", encoding="utf-8", newline="") as file:
                 room_key_list = json.load(file)
@@ -92,4 +94,5 @@ class HotelStay():
                 found = True
         if not found:
             raise HotelManagementException ("Error: room key not found")
+
 

@@ -62,13 +62,6 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
                          num_days:int)->str:
         """manges the hotel reservation: creates a reservation and saves it into a json file"""
 
-        room_type = self.validate(room_type)
-        credit_card = self.validate(credit_card)
-        arrival_date = self.validate(arrival_date)
-        num_days = self.validate(num_days)
-        phone_number = self.validate(phone_number)
-        name_surname = self.validate(name_surname)
-        id_card = self.validate(id_card)
 
         my_reservation = HotelReservation(id_card=id_card,
                                           credit_card_number=credit_card,
@@ -112,8 +105,11 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
         """manages the arrival of a guest with a reservation"""
         my_id_card, my_localizer = self.read_from_input_file(file_input)
 
-        my_id_card = Dni.validate(my_id_card)
-        my_localizer = Localizer.validate(my_localizer)
+
+        my_id_card = Dni(my_id_card).validate(my_id_card)
+        print(my_id_card)
+        my_localizer = Localizer(my_localizer).validate(my_localizer)
+        print(my_localizer)
         # self.validate_localizer() hay que validar
 
         #buscar en almacen
@@ -125,9 +121,9 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
             with open(file_store, "r", encoding="utf-8", newline="") as file:
                 store_list = json.load(file)
         except FileNotFoundError as ex:
-            raise HotelManagementException ("Error: store reservation not found") from ex
+            raise HotelManagementException("Error: store reservation not found") from ex
         except json.JSONDecodeError as ex:
-            raise HotelManagementException ("JSON Decode Error - Wrong JSON Format") from ex
+            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
         # compruebo si esa reserva esta en el almacen
         found = False
         for item in store_list:

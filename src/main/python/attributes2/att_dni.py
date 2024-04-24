@@ -24,3 +24,4 @@ class Dni(Attribute):
 
         if not my_regex.fullmatch(dni):
             raise hotel_management_exception.HotelManagementException("Invalid IdCard format")
+        return dni

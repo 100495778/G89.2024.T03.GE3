@@ -17,9 +17,11 @@ from python.uc3m_travel.hotel_stay import HotelStay
 from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from freezegun import freeze_time
 
+from uc3m_travel.hotel_stay import get_stay_from_roomkey
 
 
-class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localizer, NumDays, RoomKey):
+class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localizer, NumDays, RoomKey,
+                   get_stay_from_roomkey):
     """Class with all the methods for managing reservations and stay"""
     def __init__(self):
         pass
@@ -109,20 +111,7 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
     def guest_arrival(self, file_input:str)->str:
         """manages the arrival of a guest with a reservation"""
-        try:
-            with open(file_input, "r", encoding="utf-8", newline="") as file:
-                input_list = json.load(file)
-        except FileNotFoundError as ex:
-            raise HotelManagementException ("Error: file input not found") from ex
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException ("JSON Decode Error - Wrong JSON Format") from ex
-
-        # comprobar valores del fichero
-        try:
-            my_localizer = input_list["Localizer"]
-            my_id_card = input_list["IdCard"]
-        except KeyError as e:
-            raise HotelManagementException("Error - Invalid Key in JSON") from e
+        my_id_card, my_localizer = self.read_from_input_file(file_input)
 
         my_id_card = Dni.validate(my_id_card)
         my_localizer = Localizer.validate(my_localizer)
@@ -211,53 +200,23 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
         return my_checkin.room_key
 
-    def guest_checkout(self, room_key:str)->bool:
-        """manages the checkout of a guest"""
-        self.validate_roomkey(room_key)
-        #check thawt the roomkey is stored in the checkins file
-        file_store = JSON_FILES_PATH + "store_check_in.json"
+    def read_from_input_file(self, file_input):
         try:
-            with open(file_store, "r", encoding="utf-8", newline="") as file:
-                room_key_list = json.load(file)
+            with open(file_input, "r", encoding="utf-8", newline="") as file:
+                input_list = json.load(file)
         except FileNotFoundError as ex:
-            raise HotelManagementException("Error: store checkin not found") from ex
+            raise HotelManagementException("Error: file input not found") from ex
         except json.JSONDecodeError as ex:
             raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        # comprobar que esa room_key es la que me han dado
-        found = False
-        for item in room_key_list:
-            if room_key == item["_HotelStay__room_key"]:
-                departure_date_timestamp = item["_HotelStay__departure"]
-                found = True
-        if not found:
-            raise HotelManagementException ("Error: room key not found")
-
-        today = datetime.utcnow().date()
-        if datetime.fromtimestamp(departure_date_timestamp).date() != today:
-            raise HotelManagementException("Error: today is not the departure day")
-
-        file_store_checkout = JSON_FILES_PATH + "store_check_out.json"
+        # comprobar valores del fichero
         try:
-            with open(file_store_checkout, "r", encoding="utf-8", newline="") as file:
-                room_key_list = json.load(file)
-        except FileNotFoundError as ex:
-            room_key_list = []
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
+            my_localizer = input_list["Localizer"]
+            my_id_card = input_list["IdCard"]
+        except KeyError as e:
+            raise HotelManagementException("Error - Invalid Key in JSON") from e
+        return my_id_card, my_localizer
 
-        for checkout in room_key_list:
-            if checkout["room_key"] == room_key:
-                raise HotelManagementException("Guest is already out")
-
-        room_checkout={"room_key":  room_key, "checkout_time":datetime.timestamp(datetime.utcnow())}
-
-        room_key_list.append(room_checkout)
-
-        try:
-            with open(file_store_checkout, "w", encoding="utf-8", newline="") as file:
-                json.dump(room_key_list, file, indent=2)
-        except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
-
-        return True
+    def guest_checkout(self, room_key):
+        """Register the checkout of the guest"""
+        stay = HotelStay.get_stay_from_roomkey(room_key)
+        return stay.checkout()

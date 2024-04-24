@@ -4,6 +4,7 @@ import hashlib
 import json
 from uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from uc3m_travel.hotel_management_exception import HotelManagementException
+from attributes2 import att_roomkey
 
 class HotelStay():
     """Class for representing hotel stays"""
@@ -72,7 +73,7 @@ class HotelStay():
 
     def get_stay_from_roomkey(self, room_key: str)->bool:
         """manages the checkout of a guest"""
-        self.validate_roomkey(room_key)
+        att_roomkey.RoomKey(room_key).validate(room_key)
         #check thawt the roomkey is stored in the checkins file
         file_store = JSON_FILES_PATH + "store_check_in.json"
         try:
@@ -92,36 +93,3 @@ class HotelStay():
         if not found:
             raise HotelManagementException ("Error: room key not found")
 
-    def check_out(self):
-        """definition of the checkout method"""
-        # validates the checkout day
-        departure_date_timestamp = self.departure_date_timestamp
-
-        today = datetime.utcnow().date()
-        if datetime.fromtimestamp(departure_date_timestamp).date() != today:
-            raise HotelManagementException("Error: today is not the departure day")
-
-        file_store_checkout = JSON_FILES_PATH + "store_check_out.json"
-        try:
-            with open(file_store_checkout, "r", encoding="utf-8", newline="") as file:
-                room_key_list = json.load(file)
-        except FileNotFoundError:
-            room_key_list = []
-        except json.JSONDecodeError as ex:
-            raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex
-
-        for checkout in room_key_list:
-            if checkout["room_key"] == self.__room_key:
-                raise HotelManagementException("Guest is already out")
-
-        room_checkout={"room_key":  self.__room_key, "checkout_time":datetime.timestamp(datetime.utcnow())}
-
-        room_key_list.append(room_checkout)
-
-        try:
-            with open(file_store_checkout, "w", encoding="utf-8", newline="") as file:
-                json.dump(room_key_list, file, indent=2)
-        except FileNotFoundError as ex:
-            raise HotelManagementException("Wrong file  or file path") from ex
-
-        return True

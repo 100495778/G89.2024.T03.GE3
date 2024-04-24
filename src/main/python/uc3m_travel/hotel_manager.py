@@ -15,6 +15,7 @@ from python.uc3m_travel.hotel_management_exception import HotelManagementExcepti
 from python.uc3m_travel.hotel_reservation import HotelReservation
 from python.uc3m_travel.hotel_stay import HotelStay
 from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
+from python.uc3m_travel.hotel_exit import Hotel_exit
 from freezegun import freeze_time
 
 
@@ -214,4 +215,4 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
     def guest_checkout(self, room_key):
         """Register the checkout of the guest"""
         self.get_stay_from_roomkey(room_key)
-        return self.check_out()
+        return Hotel_exit(room_key).guest_checkout()

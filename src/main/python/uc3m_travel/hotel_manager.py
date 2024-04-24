@@ -17,11 +17,10 @@ from python.uc3m_travel.hotel_stay import HotelStay
 from python.uc3m_travel.hotel_management_config import JSON_FILES_PATH
 from freezegun import freeze_time
 
-from uc3m_travel.hotel_stay import get_stay_from_roomkey
 
 
 class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localizer, NumDays, RoomKey,
-                   get_stay_from_roomkey):
+                   HotelStay):
     """Class with all the methods for managing reservations and stay"""
     def __init__(self):
         pass
@@ -63,13 +62,13 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
                          num_days:int)->str:
         """manges the hotel reservation: creates a reservation and saves it into a json file"""
 
-        room_type = RoomType.validate(room_type)
-        credit_card = CreditCard.validate(credit_card)
-        arrival_date = ArrivalDate.validate(arrival_date)
-        num_days = NumDays.validate(num_days)
-        phone_number = PhoneNumber.validate(phone_number)
-        name_surname = NameSurname.validate(name_surname)
-        id_card = Dni.validate(id_card)
+        room_type = self.validate(room_type)
+        credit_card = self.validate(credit_card)
+        arrival_date = self.validate(arrival_date)
+        num_days = self.validate(num_days)
+        phone_number = self.validate(phone_number)
+        name_surname = self.validate(name_surname)
+        id_card = self.validate(id_card)
 
         my_reservation = HotelReservation(id_card=id_card,
                                           credit_card_number=credit_card,
@@ -91,16 +90,16 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
         except json.JSONDecodeError as ex:
             raise HotelManagementException ("JSON Decode Error - Wrong JSON Format") from ex
 
-        #compruebo que esta reserva no esta en la lista
+        # compruebo que esta reserva no esta en la lista
         for item in data_list:
             if my_reservation.localizer == item["_HotelReservation__localizer"]:
                 raise HotelManagementException ("Reservation already exists")
             if my_reservation.id_card == item["_HotelReservation__id_card"]:
                 raise HotelManagementException("This ID card has another reservation")
-        #añado los datos de mi reserva a la lista , a lo que hubiera
+        # añado los datos de mi reserva a la lista , a lo que hubiera
         data_list.append(my_reservation.__dict__)
 
-        #escribo la lista en el fichero
+        # escribo la lista en el fichero
         try:
             with open(file_store, "w", encoding="utf-8", newline="") as file:
                 json.dump(data_list, file, indent=2)
@@ -151,20 +150,20 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
         reservation_date = datetime.fromtimestamp(reservation_date_timestamp)
 
         with freeze_time(reservation_date):
-            new_reservation = HotelReservation(credit_card_number=reservation_credit_card,
-                                               id_card=reservation_id_card,
-                                               num_days=reservation_days,
-                                               room_type=reservation_room_type,
-                                               arrival=reservation_date_arrival,
-                                               name_surname=reservation_name,
-                                               phone_number=reservation_phone)
+            new_reservation =  HotelReservation(credit_card_number=reservation_credit_card,
+                                                id_card=reservation_id_card,
+                                                num_days=reservation_days,
+                                                room_type=reservation_room_type,
+                                                arrival=reservation_date_arrival,
+                                                name_surname=reservation_name,
+                                                phone_number=reservation_phone)
         if new_reservation.localizer != my_localizer:
             raise HotelManagementException("Error: reservation has been manipulated")
 
         # compruebo si hoy es la fecha de checkin
         reservation_format = "%d/%m/%Y"
         date_obj = datetime.strptime(reservation_date_arrival, reservation_format)
-        if date_obj.date()!= datetime.date(datetime.utcnow()):
+        if date_obj.date() != datetime.date(datetime.utcnow()):
             raise HotelManagementException("Error: today is not reservation date")
 
         # genero la room key para ello llamo a Hotel Stay
@@ -218,5 +217,5 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
 
     def guest_checkout(self, room_key):
         """Register the checkout of the guest"""
-        stay = HotelStay.get_stay_from_roomkey(room_key)
-        return stay.checkout()
+        self.get_stay_from_roomkey(room_key)
+        return self.check_out()

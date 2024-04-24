@@ -1,4 +1,4 @@
-from python.uc3m_travel.hotel_management_exception import HotelManagementException
+from uc3m_travel import hotel_management_exception
 import re
 
 class Attribute():
@@ -11,5 +11,5 @@ class Attribute():
         myregex = re.compile(self._validation_pattern)
         regex_check = myregex.fullmatch(attribute_value)
         if not regex_check:
-            raise HotelManagementException(self._error_message)
+            raise hotel_management_exception.HotelManagementException(self._error_message)
         return attribute_value

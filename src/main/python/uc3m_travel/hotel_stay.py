@@ -105,7 +105,7 @@ class HotelStay():
         try:
             with open(file_store_checkout, "r", encoding="utf-8", newline="") as file:
                 room_key_list = json.load(file)
-        except FileNotFoundError as ex:
+        except FileNotFoundError:
             room_key_list = []
         except json.JSONDecodeError as ex:
             raise HotelManagementException("JSON Decode Error - Wrong JSON Format") from ex

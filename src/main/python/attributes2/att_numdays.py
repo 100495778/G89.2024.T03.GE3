@@ -9,7 +9,6 @@ class NumDays(Attribute):
 
     def validate(self,num_days):
         """validates the number of days"""
-        super().validate(num_days)
         try:
             days = int(num_days)
         except ValueError as ex:

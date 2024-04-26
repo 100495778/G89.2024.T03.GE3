@@ -121,6 +121,7 @@ class TestHotelReservation(TestCase):
                         else:
                             hash_original = ""
 
+                        #The assert Raises is not catching the exception
                         with self.assertRaises(HotelManagementException) as c_m:
                             valor = mngr.guest_arrival(test_file)
                         self.assertEqual(c_m.exception.message, result)

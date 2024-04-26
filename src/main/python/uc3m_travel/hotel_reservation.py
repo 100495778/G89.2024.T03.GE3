@@ -4,15 +4,15 @@ from datetime import datetime
 from uc3m_travel.storage.reservation_store import RerservationStore
 from uc3m_travel.hotel_management_exception import HotelManagementException
 from freezegun import freeze_time
-from python.attributes2.att_arrival import ArrivalDate
-from python.attributes2.att_creditcard import CreditCard
-from python.attributes2.att_dni import Dni
-from python.attributes2.att_localizer import Localizer
-from python.attributes2.att_namesurname import NameSurname
-from python.attributes2.att_numdays import NumDays
-from python.attributes2.att_phonenumber import PhoneNumber
-from python.attributes2.att_roomkey import RoomKey
-from python.attributes2.att_roomtype import RoomType
+from attributes2.att_arrival import ArrivalDate
+from attributes2.att_creditcard import CreditCard
+from attributes2.att_dni import Dni
+from attributes2.att_localizer import Localizer
+from attributes2.att_namesurname import NameSurname
+from attributes2.att_numdays import NumDays
+from attributes2.att_phonenumber import PhoneNumber
+from attributes2.att_roomkey import RoomKey
+from attributes2.att_roomtype import RoomType
 
 
 class HotelReservation:

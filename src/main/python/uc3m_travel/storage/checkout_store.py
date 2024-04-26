@@ -12,10 +12,10 @@ class CheckOutStore(JSonStore):
 
     def add_item(self, check_out):
 
-        reservation_found = self.find_item("room_key", check_out["room_key"])
+        reservation_found = self.find_item("_HotelExit__room_key", check_out.room_key)
         if reservation_found:
             raise HotelManagementException("Guest is already out")
 
-        self.__data_list.append(check_out)
-        #super().add_item(check_out)
+        #self.__data_list.append(check_out)
+        super().add_item(check_out)
 

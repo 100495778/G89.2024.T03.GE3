@@ -72,6 +72,17 @@ class HotelStay():
         """returns the value of the departure date"""
         self.__departure = value
 
+    def __str__(self):
+        json_info = {"id_card": self.__id_card,
+                     "name_surname": self.__name_surname,
+                     "credit_card": self.__credit_card_number,
+                     "phone_number:": self.__phone_number,
+                     "reservation_date": self.__reservation_date,
+                     "arrival_date": self.__arrival,
+                     "num_days": self.__num_days,
+                     "room_type": self.__room_type,
+                     }
+        return "HotelReservation:" + json_info.__str__()
     def get_stay_from_roomkey(self, room_key: str)->bool:
         """manages the checkout of a guest"""
         att_roomkey.RoomKey(room_key).validate(room_key)

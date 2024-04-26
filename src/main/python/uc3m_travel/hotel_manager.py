@@ -89,11 +89,11 @@ class HotelManager(CreditCard, PhoneNumber, Dni, RoomType, ArrivalDate, Localize
     def guest_checkout(self, room_key):
         """Register the checkout of the guest"""
         checkout_json = CheckOutStore()
-        check_out_info = {"room_key": room_key, "checkout_time": datetime.timestamp(datetime.utcnow())}
 
-        check_out = HotelExit(room_key)
-        check_out.guest_checkout()
-        checkout_json.add_item(check_out_info)
+
+        mycheck_out = HotelExit(room_key)
+        mycheck_out.guest_checkout()
+        checkout_json.add_item(mycheck_out)
         checkout_json.save_list_to_file()
 
         return True

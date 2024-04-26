@@ -7,10 +7,11 @@ import hashlib
 from unittest import TestCase
 from os import remove
 from freezegun import freeze_time
-from uc3m_travel import (JSON_FILES_PATH,
-                         JSON_FILES_GUEST_ARRIVAL,
-                         HotelManager,
-                         HotelManagementException)
+from uc3m_travel import HotelManager
+from uc3m_travel import HotelManagementException
+from uc3m_travel import JSON_FILES_PATH
+from uc3m_travel import JSON_FILES_GUEST_ARRIVAL
+
 
 class TestHotelReservation(TestCase):
     """Class for testing deliver_product"""
@@ -110,6 +111,7 @@ class TestHotelReservation(TestCase):
                         # if found is False , this assert fails
                         self.assertTrue(found)
                 else:
+
                     with self.subTest(test_id + valid):
                         # read the file to compare file content before and after method call
                         checkins_file = JSON_FILES_PATH + "store_check_in.json"
@@ -122,6 +124,7 @@ class TestHotelReservation(TestCase):
                         with self.assertRaises(HotelManagementException) as c_m:
                             valor = mngr.guest_arrival(test_file)
                         self.assertEqual(c_m.exception.message, result)
+
                         if os.path.isfile(checkins_file):
                             with open(checkins_file, "r", encoding="utf-8", newline="") as file:
                                 hash_new = hashlib.md5(str(file).encode()).hexdigest()
